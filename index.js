@@ -2,15 +2,18 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 80;
 
+// 🔧 Middleware pour parser les requêtes POST de Twilio
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// 🔹 Route racine pour tester si le serveur tourne
 app.get("/", (req, res) => {
   res.send("✅ Serveur Twilio opérationnel !");
 });
 
+// 🔹 TwiML de démarrage (Twilio appelle ici dès que l'appel commence)
 app.get("/twiml", (req, res) => {
-  const message = req.query.msg || "Bonjour, ceci est un appel test.";
+  const message = "Bonjour, ceci est un appel test."; // 👈 FIXÉ ici
   console.log("📞 Appel démarré avec message :", message);
 
   const xml = `
@@ -31,14 +34,13 @@ app.get("/twiml", (req, res) => {
   console.log("📤 XML TwiML envoyé :", xml);
 });
 
+// 🔹 Analyse la réponse vocale ("Allô" ou non)
 app.post("/trigger", (req, res) => {
   console.log("📥 Requête POST /trigger reçue");
   console.log("🧾 Body complet :", req.body);
 
   const transcript = req.body.SpeechResult || "";
-  const msg = req.query.msg
-    ? decodeURIComponent(req.query.msg)
-    : "Bonjour, ceci est un appel test.";
+  const message = "Bonjour, ceci est un appel test."; // 👈 FIXÉ aussi ici
 
   console.log("🎤 Réponse vocale détectée :", transcript);
 
@@ -50,7 +52,7 @@ app.post("/trigger", (req, res) => {
     res.send(`
       <Response>
         <Say voice="Polly.Matthieu" language="fr-FR">
-          ${msg}
+          ${message}
         </Say>
       </Response>
     `);
@@ -66,6 +68,7 @@ app.post("/trigger", (req, res) => {
   }
 });
 
+// 🔚 Démarre le serveur
 app.listen(port, () => {
   console.log(`✅ TwiML Server with voice detection is running on port ${port}`);
 });
