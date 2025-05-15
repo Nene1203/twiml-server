@@ -29,6 +29,7 @@ app.get("/twiml", (req, res) => {
     </Response>
   `;
 
+  console.log("✅ Twilio nous a bien appelé !");
   res.set("Content-Type", "text/xml");
   res.send(xml);
   console.log("📤 XML TwiML envoyé :", xml);
@@ -57,6 +58,7 @@ app.post("/trigger", (req, res) => {
       </Response>
     `);
   } else {
+    console.log("✅ Twilio nous a bien appelé !");
     res.set("Content-Type", "text/xml");
     res.send(`
       <Response>
