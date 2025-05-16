@@ -33,7 +33,7 @@ app.post("/twiml", async (req, res) => {
   const { nom, prenom, civilite, etape_actuelle } = data;
 
   try {
-    const prompt = `Tu es un assistant vocal intelligent qui appelle un prospect ayant effectué une demande de devis en ligne. \n\nVoici le contexte :\n- Prénom : ${prenom}\n- Nom : ${nom}\n- Statut : ${civilite}\n- Société : Green Impact\n- Objectif : prendre un rendez-vous pour parler du projet de panneaux solaires\n- Ton : chaleureux, professionnel, clair\n\nEtape actuelle : ${etape_actuelle}\n\nStructure obligatoire :\n- Question à poser (voix IA)\n- Si une réponse du prospect est détectée : valider la réponse par un court message\n- Sinon : reformuler ou conclure si 3 tentatives échouent\n\nFormat : XML TwiML avec voix masculine Polly.Matthieu`;
+    const prompt = `Tu es un assistant vocal intelligent qui appelle un prospect ayant effectué une demande de devis en ligne. \n\nVoici le contexte :\n- Prénom : ${prenom}\n- Nom : ${nom}\n- Statut : ${civilite}\n- Société : Green Impact\n- Objectif : prendre un rendez-vous pour parler du projet de panneaux solaires\n- Ton : chaleureux, professionnel, clair\n\nEtape actuelle : ${etape_actuelle}\n\nStructure obligatoire :\n- Question à poser (voix IA)\n- Si une réponse du prospect est détectée : valider la réponse par un court message\n- Sinon : reformuler ou conclure si 3 tentatives échouent\n\nFormat : XML TwiML avec voix masculine Polly.Mathieu`;
 
     const gptResponse = await axios.post(
       "https://api.openai.com/v1/chat/completions",
