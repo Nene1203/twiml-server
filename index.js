@@ -20,7 +20,7 @@ app.get("/twiml", (req, res) => {
     <Response>
       <Gather input="speech" action="/trigger" method="POST" language="fr-FR" timeout="5">
         <Say voice="Polly.Matthieu" language="fr-FR">
-          Bonjour, dites "Allô" pour commencer.
+          Bonjour, dites "Allo" pour commencer.
         </Say>
       </Gather>
       <Say voice="Polly.Matthieu" language="fr-FR">
