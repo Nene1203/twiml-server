@@ -18,7 +18,7 @@ app.get("/twiml", (req, res) => {
 
   const xml = `
     <Response>
-      <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, test simple.</Say>
+      <Say voice="Polly.Mathieu" language="fr-FR">Bonjour, test simple.</Say>
     </Response>
   `;
 
@@ -34,7 +34,7 @@ app.post("/twiml", (req, res) => {
 
   const xml = `
     <Response>
-      <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, test simple.</Say>
+      <Say voice="Polly.Mathieu" language="fr-FR">Bonjour, test simple.</Say>
     </Response>
   `;
 
@@ -60,7 +60,7 @@ app.post("/trigger", (req, res) => {
     res.send(`<Response><Say voice="Polly.Matthieu" language="fr-FR">${msg}</Say></Response>`);
   } else {
     res.set("Content-Type", "text/xml");
-    res.send(`<Response><Say voice="Polly.Matthieu" language="fr-FR">Je n'ai pas compris. Merci et à bientôt.</Say></Response>`);
+    res.send(`<Response><Say voice="Polly.Mathieu" language="fr-FR">Je n'ai pas compris. Merci et à bientôt.</Say></Response>`);
   }
 });
 
