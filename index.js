@@ -19,7 +19,7 @@ app.get("/twiml", (req, res) => {
   const xml = `
     <Response>
       <Gather input="speech" action="/trigger" method="POST" language="fr-FR" timeout="5">
-        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites "Allo" pour commencer.</Say>
+        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites Allo pour commencer.</Say>
       </Gather>
       <Say voice="Polly.Matthieu" language="fr-FR">Je n'ai rien entendu, au revoir.</Say>
     </Response>
@@ -38,7 +38,7 @@ app.post("/twiml", (req, res) => {
   const xml = `
     <Response>
       <Gather input="speech" action="/trigger" method="POST" language="fr-FR" timeout="5">
-        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites "Allo" pour commencer.</Say>
+        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites Allo pour commencer.</Say>
       </Gather>
       <Say voice="Polly.Matthieu" language="fr-FR">Je n'ai rien entendu, au revoir.</Say>
     </Response>
