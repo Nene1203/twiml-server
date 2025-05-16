@@ -2,16 +2,16 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 10000;
 
-// Middleware pour parser le corps des requêtes POST
+// Middleware pour parser les requêtes POST
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Route racine pour tester si le serveur est en ligne
+// Test racine
 app.get("/", (req, res) => {
   res.send("✅ Serveur Twilio opérationnel !");
 });
 
-// GET /twiml — test dans navigateur
+// GET /twiml — test manuel
 app.get("/twiml", (req, res) => {
   const message = "Bonjour, ceci est un appel test.";
   console.log("📞 [GET] Appel de test avec message :", message);
@@ -19,13 +19,9 @@ app.get("/twiml", (req, res) => {
   const xml = `
     <Response>
       <Gather input="speech" action="/trigger" method="POST" language="fr-FR" timeout="5">
-        <Say voice="Polly.Matthieu" language="fr-FR">
-          Bonjour, dites "Allo" pour commencer.
-        </Say>
+        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites "Allo" pour commencer.</Say>
       </Gather>
-      <Say voice="Polly.Matthieu" language="fr-FR">
-        Je n'ai rien entendu, au revoir.
-      </Say>
+      <Say voice="Polly.Matthieu" language="fr-FR">Je n'ai rien entendu, au revoir.</Say>
     </Response>
   `;
 
@@ -34,7 +30,7 @@ app.get("/twiml", (req, res) => {
   console.log("📤 XML TwiML envoyé :", xml);
 });
 
-// POST /twiml — pour Twilio
+// POST /twiml — webhook Twilio
 app.post("/twiml", (req, res) => {
   const message = "Bonjour, ceci est un appel test.";
   console.log("📞 [POST] Twilio nous a appelé avec message :", message);
@@ -42,13 +38,9 @@ app.post("/twiml", (req, res) => {
   const xml = `
     <Response>
       <Gather input="speech" action="/trigger" method="POST" language="fr-FR" timeout="5">
-        <Say voice="Polly.Matthieu" language="fr-FR">
-          Bonjour, dites "Allo" pour commencer.
-        </Say>
+        <Say voice="Polly.Matthieu" language="fr-FR">Bonjour, dites "Allo" pour commencer.</Say>
       </Gather>
-      <Say voice="Polly.Matthieu" language="fr-FR">
-        Je n'ai rien entendu, au revoir.
-      </Say>
+      <Say voice="Polly.Matthieu" language="fr-FR">Je n'ai rien entendu, au revoir.</Say>
     </Response>
   `;
 
@@ -57,7 +49,7 @@ app.post("/twiml", (req, res) => {
   console.log("📤 XML TwiML envoyé :", xml);
 });
 
-// POST /trigger — déclenché quand l'utilisateur parle
+// POST /trigger — retour après parole utilisateur
 app.post("/trigger", (req, res) => {
   console.log("📥 Requête POST /trigger reçue");
   console.log("🧾 Body complet :", req.body);
@@ -67,30 +59,18 @@ app.post("/trigger", (req, res) => {
   console.log("🎤 Réponse vocale détectée :", transcript);
 
   if (
-    transcript.toLowerCase().includes("allô") ||
-    transcript.toLowerCase().includes("allo")
+    transcript.toLowerCase().includes("allo") ||
+    transcript.toLowerCase().includes("allô")
   ) {
     res.set("Content-Type", "text/xml");
-    res.send(`
-      <Response>
-        <Say voice="Polly.Matthieu" language="fr-FR">
-          ${msg}
-        </Say>
-      </Response>
-    `);
+    res.send(`<Response><Say voice="Polly.Matthieu" language="fr-FR">${msg}</Say></Response>`);
   } else {
     res.set("Content-Type", "text/xml");
-    res.send(`
-      <Response>
-        <Say voice="Polly.Matthieu" language="fr-FR">
-          Je n'ai pas compris. Merci et à bientôt.
-        </Say>
-      </Response>
-    `);
+    res.send(`<Response><Say voice="Polly.Matthieu" language="fr-FR">Je n'ai pas compris. Merci et à bientôt.</Say></Response>`);
   }
 });
 
-// Lancement du serveur
+// Démarrage du serveur
 app.listen(port, () => {
   console.log(`✅ TwiML Server is running on port ${port}`);
 });
