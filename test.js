@@ -9,17 +9,8 @@ app.use(express.json());
 
 // 🔁 Liste des étapes du call
 const etapes = [
-  "Etape 1 - Introduction",
-  "Etape 2 - Disponibilité",
-  "Etape 3 - Motivation",
-  "Etape 4 - Budget",
-  "Etape 5 - Timing",
-  "Etape 6 - Infos maison",
-  "Etape 7 - Pourquoi Green Impact",
-  "Etape 8 - Proposition RDV",
-  "Etape 9 - Confirmation RDV",
-  "Etape 10 - Conclusion",
-  "Terminé"
+  "etape1", "etape2", "etape3", "etape4", "etape5",
+  "etape6", "etape7", "etape8", "etape9", "etape10", "termine"
 ];
 
 // 🧪 Test racine
@@ -29,12 +20,69 @@ app.get("/", (req, res) => {
 
 // 🎯 Génère le TwiML dynamiquement à chaque étape
 app.post("/twiml", async (req, res) => {
-  const data = req.body;
-  const { nom, prenom, civilite, etape_actuelle } = data;
+  const { nom, prenom, civilite, etape_actuelle } = req.body;
+
+  const prompt = `Tu es un assistant vocal intelligent qui appelle un prospect ayant effectué une demande de devis en ligne.
+
+🎯 Objectif :
+Poser une série de questions pour mieux comprendre son besoin en panneaux solaires, tout en restant chaleureux et professionnel. À chaque étape, tu poses une question, attends la réponse, valides ou répètes si besoin. Chaque échange suit cette structure :
+- Question de l’Agent IA
+- Réponse du Prospect
+- Validation de la réponse par l’Agent IA
+- Si pas de réponse, répète la question jusqu’à 3 fois, puis conclus poliment
+
+📄 Contexte du prospect :
+- Civilité : ${civilite} (Monsieur ou Madame)
+- Nom : ${nom}
+- Prénom : ${prenom}
+- Société : Green Impact
+- Étape actuelle : ${etape_actuelle}
+
+📌 Étapes possibles et message attendu :
+
+Si l’étape est "etape1", dire :
+"Oui bonjour ${civilite} ${nom}, je suis Hector de chez Green Impact. Je fais suite à votre demande de devis en ligne, vous vous en souvenez ?"
+
+Si l’étape est "etape2", dire :
+"Avez-vous 5 minutes pour qu’on discute un peu de vos besoins ?"
+
+Si l’étape est "etape3", dire :
+"Qu’est-ce qui vous motive à installer des panneaux solaires chez vous ? Pour réduire vos factures ? Pour des raisons écologiques ? Ou pour devenir autonome ?"
+
+Si l’étape est "etape4", dire :
+"Avez-vous une idée du montant que vous souhaitez économiser sur vos factures d’énergie ?"
+
+Si l’étape est "etape5", dire :
+"Qu’est-ce qui vous a poussé à faire cette demande maintenant ?"
+
+Si l’étape est "etape6", dire :
+"Pourriez-vous me parler un peu de votre maison ? Quelle est sa surface, et avez-vous une idée de la surface du toit disponible ?"
+
+Si l’étape est "etape7", dire :
+"Pourquoi avez-vous choisi Green Impact ? Qu’est-ce qui vous a attiré chez nous ?"
+
+Si l’étape est "etape8", dire :
+"Quel moment vous conviendrait le mieux cette semaine ? J’ai des créneaux disponibles jeudi à 10h ou vendredi à 14h."
+
+Si l’étape est "etape9", dire :
+"Parfait. Je vais confirmer notre rendez-vous pour vendredi à 14h. Est-ce que cela vous convient bien ?"
+
+Si l’étape est "etape10", dire :
+"Merci beaucoup ${civilite} ${nom}. Vous recevrez un email de confirmation avec toutes les infos nécessaires. Très bonne journée et à bientôt !"
+
+🛠 Format attendu en XML TwiML :
+<Response>
+  <Gather input="speech" action="/trigger" method="POST">
+    <Say voice="Polly.Matthieu" language="fr-FR">[Texte de la question selon l'étape]</Say>
+  </Gather>
+</Response>
+
+Si aucune réponse n’est détectée après 3 tentatives, dis :
+<Response>
+  <Say voice="Polly.Matthieu" language="fr-FR">Je n’ai pas réussi à vous entendre. Je vous recontacterai plus tard. Merci !</Say>
+</Response>`;
 
   try {
-    const prompt = `Tu es un assistant vocal intelligent qui appelle un prospect ayant effectué une demande de devis en ligne. \n\nVoici le contexte :\n- Prénom : ${prenom}\n- Nom : ${nom}\n- Statut : ${civilite}\n- Société : Green Impact\n- Objectif : prendre un rendez-vous pour parler du projet de panneaux solaires\n- Ton : chaleureux, professionnel, clair\n\nEtape actuelle : ${etape_actuelle}\n\nStructure obligatoire :\n- Question à poser (voix IA)\n- Si une réponse du prospect est détectée : valider la réponse par un court message\n- Sinon : reformuler ou conclure si 3 tentatives échouent\n\nFormat : XML TwiML avec voix masculine Polly.Mathieu`;
-
     const gptResponse = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -70,8 +118,7 @@ app.post("/trigger", async (req, res) => {
   const record = await findRecordByCallSid(CallSid); // fonction fictive 
 
   const current = record.fields["etape actuelle"];
-  const i = etapes.indexOf(current);
-  const next = etapes[i + 1] || "Terminé";
+  const next = getNextEtape(current);
 
   // 🔃 Mise à jour Airtable
   await axios.patch(
@@ -88,6 +135,11 @@ app.post("/trigger", async (req, res) => {
     </Response>
   `);
 });
+
+function getNextEtape(current) {
+  const index = etapes.indexOf(current);
+  return index < etapes.length - 1 ? etapes[index + 1] : "termine";
+}
 
 app.listen(port, () => {
   console.log(`✅ Serveur vocal IA à l'écoute sur le port ${port}`);
